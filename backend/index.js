@@ -6,56 +6,15 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 
 const { HoldingsModel } = require("./models/HoldingsModel");
-const { PositionModel } = require("./models/PositionsModel");
+const { PositionsModel } = require("./models/PositionsModel");
 
 const PORT = process.env.PORT || 3000;
 const uri = process.env.MONGO_URL;
 
 const app = express();
-mongoose.connect;
 
-// app.get("/addHoldings", async (req, res) => {
-//   let tempHoldings = [
-//     {
-//       name: "BHARTIARTL",
-//       qty: 2,
-//       avg: 538.05,
-//       price: 541.15,
-//       net: "+0.58%",
-//       day: "+2.99%",
-//     },
-//     {
-//       name: "HDFCBANK",
-//       qty: 2,
-//       avg: 1383.4,
-//       price: 1522.35,
-//       net: "+10.04%",
-//       day: "+0.11%",
-//     },
-//     {
-//       name: "HINDUNILVR",
-//       qty: 1,
-//       avg: 2335.85,
-//       price: 2417.4,
-//       net: "+3.49%",
-//       day: "+0.21%",
-//     },
-//   ];
-
-//   tempHoldings.forEach((item) => {
-//     let newHolding = new HoldingsModel({
-//       name: item.name,
-//       qty: item.qty,
-//       avg: item.avg,
-//       price: item.price,
-//       net: item.day,
-//       day: item.day,
-//     });
-
-//     newHolding.save();
-//   });
-//   res.send("done!");
-// });
+app.use(cors());
+app.use(bodyParser.json());
 
 app.get("/addPositions", async (req, res) => {
   let tempPositions = [
@@ -82,7 +41,7 @@ app.get("/addPositions", async (req, res) => {
   ];
 
   tempPositions.forEach((item) => {
-    let newPosition = new PositionModel({
+    let newPosition = new PositionsModel({
       product: item.product,
       name: item.name,
       qty: item.qty,
@@ -98,7 +57,9 @@ app.get("/addPositions", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log("Server is running on port 3000");
-  mongoose.connect(uri);
-  console.log("MongoDB is connected");
+  console.log(`Server is running on port ${PORT}`);
+  mongoose
+    .connect(uri)
+    .then(() => console.log("MongoDB is connected"))
+    .catch((err) => console.error("MongoDB connection error:", err));
 });
