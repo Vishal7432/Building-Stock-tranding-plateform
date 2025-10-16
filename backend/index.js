@@ -6,7 +6,6 @@ require("dotenv").config();
 const OrdersModel = require("./models/OrdersModel");
 const { HoldingsModel } = require("./models/HoldingsModel");
 const { PositionsModel } = require("./models/PositionsModel");
-const { Activity } = require("react");
 
 const PORT = process.env.PORT || 3000;
 const uri = process.env.MONGO_URL;
@@ -49,15 +48,6 @@ app.post("/newOrder", async (req, res) => {
   } catch (err) {
     console.error("Error saving order:", err);
     res.status(500).send("Error saving order");
-  }
-});
-
-app.get("/Orders", async (req, res) => {
-  try {
-    const orders = await OrdersModel.find();
-    res.status(200).json(orders);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch orders" });
   }
 });
 
