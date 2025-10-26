@@ -2,8 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 require("dotenv").config();
+const cookieParser = require("cookie-parser");
+const authRoute = require("./Routes/AuthRoute");
 
-const OrdersModel = require("./models/OrdersModel");
+const OrderModel = require("./models/OrdersModel");
 const { HoldingsModel } = require("./models/HoldingsModel");
 const { PositionsModel } = require("./models/PositionsModel");
 
@@ -15,11 +17,22 @@ const app = express();
 app.use(cors());
 app.use(express.json()); // only this is needed
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); // <-- Must be before your routes
 
 app.use((req, res, next) => {
   console.log("Incoming body:", req.body);
   next();
 });
+
+app.use("/", authRoute);
+
+app.use(
+  cors({
+    origin: ["http://localhost:3000"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
 app.get("/allHoldings", async (req, res) => {
   const allHoldings = await HoldingsModel.find({});
@@ -52,7 +65,10 @@ app.post("/newOrder", async (req, res) => {
 });
 
 mongoose
-  .connect(uri)
+  .connect(uri, {
+    // useNewUrlParser: true,
+    // // useUnifiedTopology: true,
+  })
   .then(() => console.log("MongoDB is connected"))
   .catch((err) => console.error(" MongoDB connection error:", err));
 
