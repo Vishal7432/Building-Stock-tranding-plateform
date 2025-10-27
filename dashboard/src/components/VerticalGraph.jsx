@@ -19,7 +19,7 @@ ChartJS.register(
   Legend
 );
 
-export const options = {
+export const option = {
   responsive: true,
   plugins: {
     legend: {
