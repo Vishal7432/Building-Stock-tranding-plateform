@@ -162,7 +162,7 @@ const WatchListActions = ({ uid }) => {
           arrow
           slots={{ transition: Grow }}
         >
-          <button className="action">
+          <button className="action mt-0.5">
             <BarChartOutlined className="icon" />
           </button>
         </Tooltip>
@@ -172,7 +172,7 @@ const WatchListActions = ({ uid }) => {
           arrow
           slots={{ transition: Grow }}
         >
-          <button className="action">
+          <button className="action mt-2">
             <MoreHoriz className="icon" />
           </button>
         </Tooltip>

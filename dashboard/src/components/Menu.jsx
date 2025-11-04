@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import UserCard from "./UserCard";
 
 const Menu = () => {
   const [selectedMenu, setSelectedMenu] = useState(0);
@@ -12,6 +13,20 @@ const Menu = () => {
 
   const handleProfileClick = () => {
     setIsProfileDropdownOpen(!isProfileDropdownOpen);
+  };
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // clear frontend state (adjust if you store auth tokens differently)
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch (e) {
+      console.error("Error clearing storage on logout", e);
+    }
+    // navigate to login
+    navigate("/login");
   };
 
   const menuClass = "menu";
@@ -90,9 +105,28 @@ const Menu = () => {
           </li>
         </ul>
         <hr />
-        <div className="profile" onClick={handleProfileClick}>
-          <div className="avatar">ZU</div>
-          <p className="username">USERID</p>
+        <div className="profile">
+          <div className="profile-info" onClick={handleProfileClick}>
+            {/* compact user card shown in navbar */}
+            <UserCard
+              name={"Vishal"}
+              email={"vishal@example.com"}
+              compact={true}
+            />
+          </div>
+
+          {/* dropdown with full details */}
+          {isProfileDropdownOpen && (
+            <div className="profile-dropdown">
+              <UserCard
+                name={"Vishal"}
+                email={"vishal@example.com"}
+                bio={"Active trader"}
+                image={"/avatar.png"}
+                onLogout={handleLogout}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

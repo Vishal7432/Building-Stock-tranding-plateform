@@ -1,47 +1,60 @@
 import React, { useState, useEffect } from "react";
 
 import axios from "axios";
-import { VerticalGraph } from "./VerticalGraph";
-// import { holdings } from "../data/data";
-
-// import { holdings } from "../data/data";
+import VerticalGraph from "./VerticalGraph";
+import { holdings } from "../data/data";
 
 const Holdings = () => {
   const [allHoldings, setAllHoldings] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:3000/allHoldings").then((res) => {
-      console.log(res.data);
-      setAllHoldings(res.data);
-    });
+    axios
+      .get("http://localhost:3000/allHoldings")
+      .then((res) => {
+        console.log(res.data);
+        setAllHoldings(res.data || []);
+      })
+      .catch((err) => {
+        // Show network/CORS errors in console and keep UI stable
+        console.error("Error fetching holdings:", err);
+        setAllHoldings([]);
+      });
   }, []);
 
-  // const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-  // const labels = allHoldings.map((subArray) => subArray["name"]);
+  // const labels = [
+  //   "January",
+  //   "February",
+  //   "March",
+  //   "April",
+  //   "May",
+  //   "June",
+  //   "July",
+  // ];
+  const labels = allHoldings.map((subArray) => subArray["name"]);
 
-  // const data = {
-  //   labels,
-  //   datasets: [
-  //     {
-  //       label: "Stock Price",
-  //       data: allHoldings.map((stock) => stock.price),
-  //       backgroundColor: "rgba(255, 99, 132, 0.5)",
-  //     },
-  //   ],
-  // };
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: "Stock Price",
+        data: allHoldings.map((stock) => stock.price),
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
+      },
+    ],
+  };
 
   // export const data = {
   //   labels,
   //   datasets: [
-  // {
-  //   label: 'Dataset 1',
-  //   data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
-  //   backgroundColor: 'rgba(255, 99, 132, 0.5)',
-  // },
   //     {
-  //       label: 'Dataset 2',
+  //       label: "Dataset 1",
   //       data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
-  //       backgroundColor: 'rgba(53, 162, 235, 0.5)',
+  //       backgroundColor: "rgba(255, 99, 132, 0.5)",
+  //     },
+  //     {
+  //       label: "Dataset 2",
+  //       data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
+  //       backgroundColor: "rgba(53, 162, 235, 0.5)",
   //     },
   //   ],
   // };
@@ -66,23 +79,27 @@ const Holdings = () => {
           </tbody>
 
           {allHoldings.map((stock, index) => {
-            const curValue = stock.price * stock.qty;
-            const isProfit = curValue - stock.avg * stock.qty >= 0.0;
+            // Defensive conversion in case backend returns missing/undefined fields
+            const qty = Number(stock.qty || 0);
+            const avg = Number(stock.avg || 0);
+            const price = Number(stock.price || 0);
+            const curValue = price * qty;
+            const isProfit = curValue - avg * qty >= 0.0;
             const profClass = isProfit ? "profit" : "loss";
             const dayClass = stock.isLoss ? "loss" : "profit";
 
             return (
               <tr key={index}>
                 <td>{stock.name}</td>
-                <td>{stock.qty}</td>
-                <td>{stock.avg.toFixed(2)}</td>
-                <td>{stock.price.toFixed(2)}</td>
-                <td>{curValue.toFixed(2)}</td>
+                <td>{qty}</td>
+                <td>{Number(avg).toFixed(2)}</td>
+                <td>{Number(price).toFixed(2)}</td>
+                <td>{Number(curValue).toFixed(2)}</td>
                 <td className={profClass}>
-                  {(curValue - stock.avg * stock.qty).toFixed(2)}
+                  {Number(curValue - avg * qty).toFixed(2)}
                 </td>
-                <td className={profClass}>{stock.net}</td>
-                <td className={dayClass}>{stock.day}</td>
+                <td className={profClass}>{stock.net ?? "-"}</td>
+                <td className={dayClass}>{stock.day ?? "-"}</td>
               </tr>
             );
           })}
@@ -107,7 +124,7 @@ const Holdings = () => {
           <p>P&L</p>
         </div>
       </div>
-      {/* <VerticalGraph data={data} /> */}
+      <VerticalGraph data={data} />
     </>
   );
 };
